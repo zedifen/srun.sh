@@ -4,7 +4,7 @@
 MY_NET_INTERFACE=${MY_NET_INTERFACE="eth4"}
 
 # GET IP ADDRESS
-MY_IP=$(ifconfig $MY_NET_INTERFACE | grep "inet " | cut -d: -f2 | awk '{print $1}')
+MY_IP=$(ip -f inet addr show $MY_NET_INTERFACE | awk '/inet / {print $2}' | cut -d '/' -f 1)
 
 # TEST CONNECTIVITY
 if ping -q -c 1 -I $MY_NET_INTERFACE www.gstatic.com; then
