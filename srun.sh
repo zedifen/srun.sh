@@ -58,11 +58,11 @@ sencode() {
       c2=$(ord "${str:i+1:1}")
       c3=$(ord "${str:i+2:1}")
       c4=$(ord "${str:i+3:1}")
-      echo $(( $c1 | $c2 << 8 | $c3 << 16 | $c4 << 24 ))
+      printf '%d ' $(( $c1 | $c2 << 8 | $c3 << 16 | $c4 << 24 ))
   done
   if [ "$2" = "true" ];
   then
-    echo "$slen"
+    printf '%d ' "$slen"
   fi;
 }
 
