@@ -6,12 +6,16 @@ MY_NET_INTERFACE=${MY_NET_INTERFACE="eth4"}
 # GET IP ADDRESS
 MY_IP=$(ip -f inet addr show $MY_NET_INTERFACE | awk '/inet / {print $2}' | cut -d '/' -f 1)
 
+log() {
+  printf "[%s] %s: %s\n" "$(date --rfc-3339 sec)" "$1" "$2"
+}
+
 # TEST CONNECTIVITY
 if ping -q -c 1 -I $MY_NET_INTERFACE www.gstatic.com; then
-    echo "INFO: Internet connection is OK."
-    exit 0
+  log INFO "Internet connection is OK."
+  exit 0
 else
-    echo "INFO: Internet connection is down, need login."
+  log INFO "Internet connection is down, need login."
 fi
 
 # SCRIPT INPUTS
@@ -44,7 +48,7 @@ curl -X GET -i -G -L \
   | grep -o '"challenge": *"[^"]*' | grep -o '[^"]*$'
 )
 
-echo "The token is: $TOKEN";
+log INFO "The token is: $TOKEN";
 
 ord() {
   printf '%d ' "'$1"
@@ -68,7 +72,7 @@ sencode() {
 
 INFO='{"username":"'$AUTH_USERNAME'","password":"'$AUTH_PASSWORD'","ip":"'$MY_IP'","acid":"4","enc_ver":"srun_bx1"}'
 
-echo "The INFO is: $INFO";
+log INFO "The INFO is: $INFO";
 
 xencode() {
   v=($(sencode "$1" true))
@@ -106,7 +110,7 @@ MAGICIAN_ALPHABET="LVoJPiCN2R8G90yg+hmFHuacZ1OWMnrsSTXkYpUq/3dlbfKwv6xztjI7DeBE4
 
 SRBX1="{SRBX1}"$(xencode "$INFO" "$TOKEN" | base64 -w 0 | tr $STANDARD_ALPHABET $MAGICIAN_ALPHABET)
 
-echo "The SRBX1 is: $SRBX1";
+log INFO "The SRBX1 is: $SRBX1";
 
 HMD5=$(printf "%s" "$AUTH_PASSWORD" | openssl dgst -md5 -hmac "$TOKEN" | cut -d ' ' -f 2)
 
@@ -144,7 +148,7 @@ curl -X GET -i -G -L \
 )
 
 if [ $STATUS_TEXT != "ok" ]; then
-  echo "ERROR: Failed to login.";
+  log ERROR "Failed to login. Status: $STATUS_TEXT.";
 else
-  echo "INFO: Login successfully.";
+  log INFO "Login successfully.";
 fi
