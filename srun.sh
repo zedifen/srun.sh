@@ -94,14 +94,17 @@ xencode() {
     q=$((q - 1))
   done
   for i in "${v[@]}"; do
-    printf '\\x%02x\\x%02x\\x%02x\\x%02x' $((i & 0xff)) $((i >> 8 & 0xff)) $((i >> 16 & 0xff)) $((i >> 24 & 0xff))
+    printf \\x$(printf '%02x' $((i & 0xff)) )
+    printf \\x$(printf '%02x' $((i >> 8 & 0xff)) )
+    printf \\x$(printf '%02x' $((i >> 16 & 0xff)) )
+    printf \\x$(printf '%02x' $((i >> 24 & 0xff)) )
   done
 }
 
 STANDARD_ALPHABET="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 MAGICIAN_ALPHABET="LVoJPiCN2R8G90yg+hmFHuacZ1OWMnrsSTXkYpUq/3dlbfKwv6xztjI7DeBE45QA"
 
-SRBX1="{SRBX1}"$(echo -e -n "$(xencode "$INFO" "$TOKEN")" | base64 -w 0 | tr $STANDARD_ALPHABET $MAGICIAN_ALPHABET)
+SRBX1="{SRBX1}"$(xencode "$INFO" "$TOKEN" | base64 -w 0 | tr $STANDARD_ALPHABET $MAGICIAN_ALPHABET)
 
 echo "The SRBX1 is: $SRBX1";
 
