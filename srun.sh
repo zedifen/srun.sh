@@ -66,29 +66,6 @@ sencode() {
   fi;
 }
 
-sencode() {
-  s=$1
-  l=$(echo "$s" | grep -o .)
-  cnt=$((0))
-  val=$((0))
-  for c in $l;
-  do
-      n=$(ord "$c")
-      val=$(( val | n << (cnt*8) ))
-      cnt=$(( cnt + 1 ))
-      if [ "$cnt" = 4 ];
-      then
-        echo $val
-        cnt=$((0))
-        val=$((0))
-      fi;
-  done
-  echo $val
-  if [ "$2" = "true" ];
-  then
-    echo "${#s}"  fi;
-}
-
 INFO='{"username":"'$AUTH_USERNAME'","password":"'$AUTH_PASSWORD'","ip":"'$MY_IP'","acid":"4","enc_ver":"srun_bx1"}'
 
 echo "The INFO is: $INFO";
