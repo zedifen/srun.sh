@@ -39,7 +39,6 @@ JSONP_CALLBACK_RANDOM_NUMBER=$(( RANDOM_U64 % (MAX_RANDOM + 1 - MIN_RANDOM) + MI
 TOKEN=$(
 curl -X GET -i -G -L \
   "$CHALLENGE_API_ENDPOINT" \
-  --interface "$MY_IP" \
   -d "callback=jQueryjQuery11240$JSONP_CALLBACK_RANDOM_NUMBER""_""$TIME_STR_MILLISECONDS" \
   --data-urlencode "username=$AUTH_USERNAME" \
   -d "ip=$MY_IP" \
@@ -128,7 +127,6 @@ CHKSUM=$(printf "%s" "$CHKSTR" | openssl dgst -sha1 | cut -d ' ' -f 2)
 STATUS_TEXT=$(
 curl -X GET -i -G -L \
   "$SRUNPORTAL_API_ENDPOINT" \
-  --interface "$MY_IP" \
   -d "callback=jQuery11240$JSONP_CALLBACK_RANDOM_NUMBER""_""$TIME_STR_MILLISECONDS" \
   -d "action=login" \
   --data-urlencode "username=$AUTH_USERNAME" \

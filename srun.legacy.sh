@@ -18,7 +18,6 @@ API_ENDPOINT=${API_ENDPOINT="http://192.168.2.231/srun_portal_pc.php?ac_id=1&"}
   
 curl -i -L \
   -X POST \
-  --interface $MY_IP \
   -d "action=login" \
   -d "ac_id=1" \
   -d "user_ip=$MY_IP" \
