@@ -37,13 +37,13 @@ RANDOM_U64=$(od -N7 -tu8 -An /dev/urandom)
 JSONP_CALLBACK_RANDOM_NUMBER=$(( RANDOM_U64 % (MAX_RANDOM + 1 - MIN_RANDOM) + MIN_RANDOM ))
 
 TOKEN=$(
-curl -X GET -i -G -L \
-  "$CHALLENGE_API_ENDPOINT" \
-  -d "callback=jQueryjQuery11240$JSONP_CALLBACK_RANDOM_NUMBER""_""$TIME_STR_MILLISECONDS" \
-  --data-urlencode "username=$AUTH_USERNAME" \
-  -d "ip=$MY_IP" \
-  -d "_=$TIME_STR_MILLISECONDS" \
-  -A "$MY_USER_AGENT" \
+wget -O- \
+  "$CHALLENGE_API_ENDPOINT"\
+"?callback=jQueryjQuery11240$JSONP_CALLBACK_RANDOM_NUMBER""_""$TIME_STR_MILLISECONDS"\
+"&username=$AUTH_USERNAME"\
+"&ip=$MY_IP"\
+"&_=$TIME_STR_MILLISECONDS"\
+  -U "$MY_USER_AGENT" \
   | grep -o '"challenge": *"[^"]*' | grep -o '[^"]*$'
 )
 
@@ -124,24 +124,40 @@ $TOKEN$SRBX1
 
 CHKSUM=$(printf "%s" "$CHKSTR" | openssl dgst -sha1 | cut -d ' ' -f 2)
 
+rawurlencode() {
+  local string="${1}"
+  local strlen=${#string}
+  local encoded=""
+  local pos c o
+  for (( pos=0 ; pos<strlen ; pos++ )); do
+     c=${string:$pos:1}
+     case "$c" in
+        [-_.~a-zA-Z0-9] ) o="${c}" ;;
+        * )               printf -v o '%%%02x' "'$c"
+     esac
+     encoded+="${o}"
+  done
+  echo "${encoded}"
+}
+
 STATUS_TEXT=$(
-curl -X GET -i -G -L \
-  "$SRUNPORTAL_API_ENDPOINT" \
-  -d "callback=jQuery11240$JSONP_CALLBACK_RANDOM_NUMBER""_""$TIME_STR_MILLISECONDS" \
-  -d "action=login" \
-  --data-urlencode "username=$AUTH_USERNAME" \
-  --data-urlencode "password={MD5}$HMD5" \
-  -d "os=Windows+10" \
-  -d "name=Windows" \
-  -d "double_stack=0" \
-  -d "chksum=$CHKSUM" \
-  --data-urlencode "info=$SRBX1" \
-  -d "ac_id=4" \
-  -d "ip=$MY_IP" \
-  -d "n=200" \
-  -d "type=1" \
-  -d "_=$TIME_STR_MILLISECONDS" \
-  -A "$MY_USER_AGENT" \
+wget -O- \
+  "$SRUNPORTAL_API_ENDPOINT"\
+"?callback=jQuery11240$JSONP_CALLBACK_RANDOM_NUMBER""_""$TIME_STR_MILLISECONDS"\
+"&action=login"\
+"&username=$AUTH_USERNAME"\
+"&password={MD5}$HMD5"\
+"&os=Windows 10"\
+"&name=Windows"\
+"&double_stack=0"\
+"&chksum=$CHKSUM"\
+"&info=$(rawurlencode "$SRBX1")"\
+"&ac_id=4"\
+"&ip=$MY_IP"\
+"&n=200"\
+"&type=1"\
+"&_=$TIME_STR_MILLISECONDS"\
+  -U "$MY_USER_AGENT" \
   | grep -o '"error": *"[^"]*' | grep -o '[^"]*$'
 )
 
